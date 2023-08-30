@@ -2,6 +2,7 @@
 
 :root {
     font-family: 'JetBrains Mono', monospace;
+    color: white;
 }
 
 body {
@@ -12,24 +13,69 @@ body {
 
 .card-collection {
     position: relative;
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 .card {
+    min-width: 0;
+    box-sizing: border-box;
     font-weight: 100;
-    color: white;
-    font-size: 1vmax;
     display: grid;
-    place-content: center;    
-    width: 30vmax;
-    height: 15vmax;
+    width: 100%;
+    height: 100%;
     border-radius: 1ex;
     background: crimson ;
     position: absolute;
-    translate: -50% -50%;
-    padding: 2ex;
-    border: 1px solid black;
+    padding: 0;
+    outline: 1px solid rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 1ex rgba(128, 128, 128, 0.2)
 }
 
 .card > p {
+    margin: 1ex 0 0 1ex;
     line-height: 1vmax;
+    user-select: none;
+    white-space: pre;
+    text-align: left;
+    min-width: 0;
+    height: calc(100% - 2ex);
+}
+
+img {
+    position: relative;
+    --shadow: 2ex;
+    z-index: 101;
+    width: 15vmax;
+    aspect-ratio: 1/ 1;
+    box-shadow: 0 0 var(--shadow) rgba(0, 0, 0, 0.1);
+    transition: all ease-in 0.1s;
+}
+
+
+img:hover { 
+    filter:hue-rotate(2);
+    --shadow: 4ex;
+}
+
+.profile {
+    font-size: 1vmax;
+    position: relative;
+    border-radius: 1ex;
+    gap: 0 1vmax;
+    width: 60vmax;
+    height: 15vmax;
+    display: grid;
+    grid-template-columns: 15vmax 45vmax;
+    grid-auto-flow: column;
+}
+
+.profile > * {
+    border-radius: 1ex;
+}
+
+.transparent-text {
+    color: transparent;
 }
