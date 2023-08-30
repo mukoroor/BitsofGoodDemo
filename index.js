@@ -1,5 +1,6 @@
 class Card {
     static count = 0;
+    static revealStack = [];
     #wrapper
     #textContainer
     #text
@@ -13,7 +14,6 @@ class Card {
         this.#wrapper.classList.add('card');
         this.#wrapper.setAttribute('id', this.#id);
         this.#wrapper.append(this.#textContainer);
-        // this.#wrapper.addEventListener('click', () => console.log('b'))
     }
 
     get text() {
@@ -46,7 +46,8 @@ class Card {
             }
             i = (++i % 2);
         }
-        currInterval = setInterval(add, 150);
+        currInterval = setInterval(add, 50);
+        Card.revealStack.push(currInterval);
     }
 }
 
@@ -62,12 +63,15 @@ class CardCollection {
         this.#container = document.createElement('ul');
         this.#container.classList.add('card-collection', 'hidden')
         this.#container.setAttribute('id', this.#id);
+        this.#container.setAttribute('title', 'click cards to shuffle deck');
     }
 
     addCard(c) {
         if (this.#cards.length == CardCollection.maxCards) return;
         this.#cards.push(c);
-        c.wrapper.style.zIndex = CardCollection.maxCards - this.#cards.length;
+        c.wrapper.setAttribute('page', this.#cards.length);
+        if (this.#cards.length == 1) c.wrapper.style.zIndex =  CardCollection.maxCards + 1;
+        else c.wrapper.style.zIndex =  CardCollection.maxCards - this.#cards.length;
         this.#container.append(c.wrapper);
         let col = this;
         c.wrapper.addEventListener('click', col.nextCard.bind(col));
@@ -76,13 +80,20 @@ class CardCollection {
     nextCard() {
         if (this.#cards.length == 1) return;
         else {
+            this.#container.classList.toggle('spread')
             let curr = this.#cards.shift();
             this.#cards.push(curr);
             const t = gsap.timeline()
             this.#cards[0].clearText()
+            this.#cards[0].wrapper.classList.add('front');
             t.to(curr.wrapper, {y: "105%", duration: 0.6, onComplete: () => {
+                    Card.revealStack.forEach(e => clearInterval(e))
                     this.#cards[0].revealText();
-                    this.#cards.forEach((e, i) => e.wrapper.style.zIndex =  CardCollection.maxCards - i);
+                    this.#cards.forEach((e, i) => {
+                        if (i == 0) e.wrapper.style.zIndex =  CardCollection.maxCards + 1;
+                        else e.wrapper.style.zIndex =  CardCollection.maxCards - i;
+                    });
+                    this.#container.classList.toggle('spread')
                 }
             })
             t.to(curr.wrapper, {y: 0, duration: 0.6})
@@ -91,26 +102,25 @@ class CardCollection {
 
     hover() {
         this.#cards.forEach((e, i) => {
-            gsap.to(e.wrapper, {scale: 0.95, rotation: 8 * (i + 1)});
+            gsap.to(e.wrapper, {scale: 0.95, rotation: 45 / this.#cards.length * (i + 1), onComplete: this.#container.classList.toggle('spread')});
         })
     }
 
     leave() {
-        this.#cards.forEach((e) => {
-            gsap.to(e.wrapper, {scale: 1, rotation: 0});
+        this.#cards.forEach((e, i) => {
+            gsap.to(e.wrapper, {scale: 1, rotation: 0, onComplete: () => this.#container.classList.toggle('spread')});
         })
     }
 
     shrink() {
-        console.log(this)
         this.#container.classList.toggle('transparent-text');
+        Card.revealStack.forEach(e => clearInterval(e));
         let t = gsap.timeline()
-        t.to(this.#container, {x: '-16vmax', width: '15vmax', color: 'none'})
-        
+        t.to(this.#container, {x: '7.5vmax', width: '15vmax'})
+        return t;
     }
 
-    grow() {
-        let t = gsap.timeline()
+    grow(t) {
         t.to(this.#container, {x: 0, width: '45vmax', onComplete: () => {
             if (this.#cards.length) {
                 this.#cards[0].clearText()
@@ -124,7 +134,6 @@ class CardCollection {
         return this.#container;
     }
 
-    // showNext
 }
 
 class Profile {
@@ -145,13 +154,15 @@ class Profile {
         this.#img.src = imgURl;
         this.#cardCollection = new CardCollection();
         this.#container.append(this.#img, this.#cardCollection.container);
-        let open = false
+        let open = true
         let p = this
         this.#img.addEventListener('click', () => {
             if (!open) {
-                p.#cardCollection.grow();
+                let t = gsap.timeline();
+                t.to(p.#img, {x: 0 , ease: Linear.easeNone})
+                p.#cardCollection.grow(t)
             } else {
-                p.#cardCollection.shrink();
+                p.#cardCollection.shrink().to(p.#img, {x: '23.5vmax', ease: Linear.easeNone})
             }
             open = !open
         })
@@ -166,20 +177,45 @@ class Profile {
     get container() {
         return this.#container;
     }
+
+    get img() {
+        return this.#img;
+    }
 }
 
 
 const profile = new Profile('profile.png', 'Oruaro');
 
 
-const c1 = new Card('Hi My Name is Oruaroghene Mukoro');
-const c2 = new Card('Mukoro');
-const c3 = new Card('Bees');
+const c1 = new Card('Hi My Name is Oruaroghene Mukoro, I am a third year Computer Science Major at Georgia Tech with threads in Intelligence and Information / Internetworks');
+const c2 = new Card('I am most passionate about giving in respect to contributing to social good, where i come from lots of people are classified as absolutely poor');
+const c3 = new Card('I am from Lagos, Nigeria and have live there for about 14years but currently live in Houston, Texas with my family');
 
 const collection = profile.cardCollection;
 collection.addCard(c1);
 collection.addCard(c2);
 collection.addCard(c3);
-document.addEventListener('DOMContentLoaded', collection.shrink.bind(collection))
+document.addEventListener('DOMContentLoaded', () => profile.img.dispatchEvent(new Event('click')))
 
-document.querySelector('body').append(profile.container);
+const b = document.querySelector('body');
+
+let input = document.createElement('input')
+input.type = 'text'
+let button = document.createElement('button')
+button.textContent = 'Add Card'
+
+let sec = document.createElement('section')
+sec.classList.add('prompt')
+sec.append(input, button)
+
+button.onclick = () => {
+    if (input.value.length == 0) return 
+    let card = new Card(input.value)
+    collection.addCard(card)
+}
+b.append(profile.container, sec);
+b.setAttribute('title', 'click the blue outline')
+let initAng = 0;
+setInterval(() => {
+    b.style.setProperty('--angle', `${initAng++}deg`);
+}, 10)

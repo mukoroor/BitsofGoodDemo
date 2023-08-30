@@ -6,6 +6,7 @@
 }
 
 body {
+    --angle: 0;
     display: grid;
     height: 100vh;
     place-content: center;
@@ -27,37 +28,68 @@ body {
     width: 100%;
     height: 100%;
     border-radius: 1ex;
-    background: crimson ;
+    background: rgb(123, 107, 95) ;
+    align-content: center;
     position: absolute;
     padding: 0;
-    outline: 1px solid rgba(0, 0, 0, 0.5);
+    z-index: 0;
+    outline: 2px solid rgba(0, 0, 0, 0.4);
     box-shadow: 0 0 1ex rgba(128, 128, 128, 0.2)
 }
 
+.card-collection::after {
+    content: '';
+    position: absolute;
+    inset: -5px;
+    z-index: 100;
+    filter: blur(0.5px);
+    background: conic-gradient(from var(--angle),#1a237e, #1976D2, #64B5F6, white, #64B5F6, #1976D2, #1a237e);
+    display: block;
+    border-radius: inherit;
+    transition: transform linear 0.5s;
+}
+
+.card-collection.spread::after {
+    opacity: 0;
+}
+
 .card > p {
-    margin: 1ex 0 0 1ex;
-    line-height: 1vmax;
+    margin: 2ex;
+    line-height: 1.5lh;
+    text-wrap: balance;
     user-select: none;
-    white-space: pre;
+    white-space: pre-wrap;
     text-align: left;
     min-width: 0;
     height: calc(100% - 2ex);
 }
 
+.card::after {
+    content: attr(page);
+    position: absolute;
+    right: 2ex;
+    top: 2ex;
+    font-weight: 900;
+    color: rgb(0, 96, 240);
+}
+
 img {
     position: relative;
     --shadow: 2ex;
+    --op: 0.4;
     z-index: 101;
     width: 15vmax;
     aspect-ratio: 1/ 1;
-    box-shadow: 0 0 var(--shadow) rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 var(--shadow) rgb(76, 80, 121, var(--op));
     transition: all ease-in 0.1s;
+    outline: 2px solid rgba(0, 0, 0, var(--op));
 }
 
 
 img:hover { 
     filter:hue-rotate(2);
-    --shadow: 4ex;
+    --shadow: 3ex;
+    --op: 0.6;
 }
 
 .profile {
@@ -78,4 +110,33 @@ img:hover {
 
 .transparent-text {
     color: transparent;
+}
+
+button {
+    background-color: rgb(101, 153, 196);
+    outline: none;
+    border: none;
+    height: 2lh;
+    font-family: 'JetBrains Mono', monospace;
+    color: rgb(17, 17, 17);
+}
+
+input {
+    color: gray;
+    font-family: 'JetBrains Mono', monospace;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.prompt > * {
+    border-radius: 0.5ex;
+}
+
+.prompt {
+    display: grid;
+    grid-template-columns: 40vmax max-content;
+    gap: 1vmax;
+    position: absolute;
+    bottom: 5%;
+    left: 50%;
+    translate: -50%;
 }
