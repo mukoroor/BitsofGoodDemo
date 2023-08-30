@@ -1,0 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800&display=swap');
+
+:root {
+    font-family: 'JetBrains Mono', monospace;
+}
+
+body {
+    display: grid;
+    height: 100vh;
+    place-content: center;
+}
+
+.card-collection {
+    position: relative;
+}
+
+.card {
+    font-weight: 100;
+    color: white;
+    font-size: 1vmax;
+    display: grid;
+    place-content: center;    
+    width: 30vmax;
+    height: 15vmax;
+    border-radius: 1ex;
+    background: crimson ;
+    position: absolute;
+    translate: -50% -50%;
+    padding: 2ex;
+    border: 1px solid black;
+}
+
+.card > p {
+    line-height: 1vmax;
+}
