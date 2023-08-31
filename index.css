@@ -45,7 +45,7 @@ body {
     filter: blur(0.5px);
     background: conic-gradient(from var(--angle),#1a237e, #1976D2, #64B5F6, white, #64B5F6, #1976D2, #1a237e);
     display: block;
-    border-radius: inherit;
+    border-radius: calc(5px + 1ex);
     transition: transform linear 0.5s;
 }
 
